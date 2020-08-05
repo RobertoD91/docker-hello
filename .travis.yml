@@ -1,0 +1,27 @@
+os:
+- linux
+#- osx
+#- windows
+
+dist: 
+  - bionic
+
+script:
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update             ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew install cask docker; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo open /Applications/Docker.app ; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sleep 60 ; fi
+  - docker pull robertod91/hello
+  - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+  - docker build -t robertod91/hello:travis .
+  #- docker buildx build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7 --push -t robertod91/hello:latest .
+  - docker push robertod91/hello:travis
+
+services: 
+  - docker
+
+notifications:
+  email:
+    on_failure: change
+    on_success: never
+
